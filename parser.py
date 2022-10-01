@@ -2,14 +2,29 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from config import BASE_DIR
+import time
+
+
 
 def get_jobs():
 	s = requests.Session()
+	
 	html = s.get("https://www.weblancer.net/jobs/veb-programmirovanie-31/").text
 	soup = BeautifulSoup (html, 'html.parser')
-	containers = soup.find_all("div", class_="row click_container-link set_href")
+	web_containers = soup.find_all("div", class_="row click_container-link set_href")
+	
+	time.sleep(5)
+
+	html = s.get("https://www.weblancer.net/jobs/prikladnoe-po-23/").text
+	soup = BeautifulSoup (html, 'html.parser')
+	po_containers = soup.find_all("div", class_="row click_container-link set_href")
+	
 	new_jobs = {}
-	for container in containers:
+	for container in web_containers:
+		row = container.find("a", class_="text-bold click_target show_visited")
+		new_jobs[row.text] = "https://www.weblancer.net" + row.attrs["href"]
+
+	for container in po_containers:
 		row = container.find("a", class_="text-bold click_target show_visited")
 		new_jobs[row.text] = "https://www.weblancer.net" + row.attrs["href"]
 
